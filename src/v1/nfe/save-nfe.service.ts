@@ -7,7 +7,7 @@ import NfeDto from "./dtos/nfe.dto";
 import ProdutoDto from "./dtos/produto.dto";
 
 @Injectable()
-export class NfeService {
+export class SaveNfeService {
 
     constructor(
         @InjectRepository(Nfe)

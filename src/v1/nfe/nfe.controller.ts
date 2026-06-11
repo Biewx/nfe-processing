@@ -1,12 +1,18 @@
-import { Controller, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Controller, Delete, Get, Param, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from '@nestjs/platform-express';
-import { NfeService } from "./nfe.service";
+import { SaveNfeService } from "./save-nfe.service";
+import FindNfeService from "./find-nfe.service";
+import { InspectNfeService } from "./inspect-nfe.service";
+import { DeleteNfeService } from "./delete-nfe.service";
 
 @Controller('xml')
 export class NfeController {
 
     constructor(
-        private readonly nfeService: NfeService
+        private readonly saveNfeService: SaveNfeService,
+        private readonly findNfesService: FindNfeService,
+        private readonly inspectNfeService: InspectNfeService,
+        private readonly deleteNfeService: DeleteNfeService
     ) {}
 
     @Post()
@@ -14,6 +20,25 @@ export class NfeController {
     async upload(
         @UploadedFile() file,
     ){
-        return await this.nfeService.processXml(file);
+        return await this.saveNfeService.processXml(file);
+    }
+
+    @Get()
+    async findAll() {
+        return await this.findNfesService.findAll();
+    }
+
+    @Get('inspect/:id')
+    async inspect(
+        @Param('id') id: string
+    ) {
+        return await this.inspectNfeService.inspect(parseInt(id));
+    }
+
+    @Delete('delete/:id') 
+    async delete(
+        @Param('id') id: string
+    ) {
+        return await this.deleteNfeService.delete(parseInt(id));
     }
 }
