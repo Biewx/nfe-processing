@@ -1,12 +1,22 @@
 import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
 import { parseStringPromise } from 'xml2js';
+import { Nfe } from "./nfe.entity";
+import { Repository } from "typeorm";
+import NfeDto from "./dtos/nfe.dto";
+import ProdutoDto from "./dtos/produto.dto";
 
 @Injectable()
 export class NfeService {
 
-    private xmlParser = (result: any) => {
+    constructor(
+        @InjectRepository(Nfe)
+        private readonly nfeRepository: Repository<Nfe>
+    ) {}
+
+    private parseXml = (result: any) : NfeDto => {
         return {
-            numero: Number(result.nota?.numero[0]),
+            numero: result.nota?.numero[0],
             produtos: result.nota?.produtos[0]?.produto.map((produto) => ({
                 nome: produto.nome[0],
                 valor: Number(produto.valor[0]),
@@ -15,20 +25,22 @@ export class NfeService {
         }
     }
 
+    private calculateTotal = (produtos: ProdutoDto[]) => {
+        return produtos.reduce((acc, produto) => acc + produto.valor, 0);
+    }
+
     async processXml(file: any) {
         const xml = file.buffer.toString();
         const result = await parseStringPromise(xml);
         
-        const nota = this.xmlParser(result);
-        const total = nota.produtos.reduce(
-            (acc, produto) => acc + produto.valor,
-            0
-        );
-        return {
-            numero: nota.numero,
-            produtos: nota.produtos,
-            qtdProdutos: nota.produtos.length,
+        const nota = this.parseXml(result);
+        const total = this.calculateTotal(nota.produtos);
+        
+        const nfe = this.nfeRepository.create({
+            numero: nota.numero.toString(),
             valorTotal: total
-        };
+        });
+
+        return this.nfeRepository.save(nfe);
     }
 }
