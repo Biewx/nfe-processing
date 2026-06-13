@@ -7,6 +7,9 @@ export class Product {
     id: number;
 
     @Column()
+    code: string
+
+    @Column()
     name: string;
 
     @Column({
@@ -14,7 +17,10 @@ export class Product {
         precision: 10,
         scale: 2,
     })
-    price: number;
+    unitPrice: number;
+
+    @Column()
+    quantity: number;
 
     @Column()
     category: string;

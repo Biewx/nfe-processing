@@ -9,6 +9,9 @@ export class Nfe {
     @Column()
     numero: string;
 
+    @Column()
+    issuedAt: Date;
+
     @Column({
         name: "valor_total",
         type: "numeric",
@@ -28,4 +31,16 @@ export class Nfe {
         { cascade: true }
     )
     products: Product[];
+
+    @Column()
+    senderCnpj: string;
+
+    @Column()
+    senderCorporateName: string;
+
+    @Column()
+    receiverCnpj: string;
+
+    @Column()
+    receiverCorporateName: string;
 }
