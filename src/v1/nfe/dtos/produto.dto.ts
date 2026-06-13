@@ -1,5 +1,13 @@
+import { IsNumber, IsOptional, IsString } from "class-validator";
+
 export default class ProdutoDto {
+    @IsString()
     nome: string;
+
+    @IsNumber()
     valor: number;
-    categoria: string;
+
+    @IsOptional()
+    @IsString()
+    categoria?: string;
 }

@@ -6,10 +6,11 @@ import { Nfe } from "./nfe.entity";
 import FindNfeService from "./find-nfe.service";
 import { InspectNfeService } from "./inspect-nfe.service";
 import { DeleteNfeService } from "./delete-nfe.service";
+import { Product } from "../product/product.entity";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Nfe])
+        TypeOrmModule.forFeature([Nfe, Product])
     ],
     controllers: [NfeController],
     providers: [

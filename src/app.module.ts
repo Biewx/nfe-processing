@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { NfeModule } from './v1/nfe/nfe.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ProductModule } from './v1/product/product.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       autoLoadEntities: true,
     }),
     
-    NfeModule
+    NfeModule,
+    ProductModule
   ],
   controllers: [AppController],
   providers: [AppService],

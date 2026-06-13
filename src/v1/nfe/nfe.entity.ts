@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Product } from "../product/product.entity";
 
 @Entity()
 export class Nfe {
@@ -20,4 +21,11 @@ export class Nfe {
         name: "created_at",
     })
     createdAt: Date;
+
+    @OneToMany(
+        () => Product,
+        product => product.nfe, 
+        { cascade: true }
+    )
+    products: Product[];
 }
