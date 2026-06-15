@@ -13,6 +13,7 @@ export class Product {
     name: string;
 
     @Column({
+        name: "unit_price",
         type: "numeric",
         precision: 10,
         scale: 2,

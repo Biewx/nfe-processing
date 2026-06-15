@@ -1,7 +1,7 @@
 import { Controller, Delete, Get, Param, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SaveNfeService } from "./save-nfe.service";
-import FindNfeService from "./find-nfe.service";
+import FindNfeService from "./find-all-nfe.service";
 import { InspectNfeService } from "./inspect-nfe.service";
 import { DeleteNfeService } from "./delete-nfe.service";
 

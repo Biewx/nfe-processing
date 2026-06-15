@@ -1,8 +1,9 @@
 import { IsArray, IsDate, IsNumber, IsString, ValidateNested } from "class-validator";
-import ProdutoDto from "./produto.dto";
+import ProdutoDto from "../../product/dtos/product.dto";
 import { Type } from "class-transformer";
 
 export default class NfeDto {
+
     @IsString()
     numero: string;
 

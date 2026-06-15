@@ -5,7 +5,7 @@ export default class ProdutoDto {
     code: string
 
     @IsString()
-    nome: string;
+    name: string;
 
     @IsNumber()
     unitPrice: number;
@@ -15,7 +15,5 @@ export default class ProdutoDto {
 
     @IsOptional()
     @IsString()
-    categoria?: string;
-
-
+    category?: string;
 }

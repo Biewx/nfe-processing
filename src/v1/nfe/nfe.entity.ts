@@ -9,7 +9,10 @@ export class Nfe {
     @Column()
     numero: string;
 
-    @Column()
+    @Column({
+        name: 'issued_at',
+        type: 'timestamp'
+    })
     issuedAt: Date;
 
     @Column({
@@ -32,15 +35,15 @@ export class Nfe {
     )
     products: Product[];
 
-    @Column()
+    @Column({name: "sender_cnpj"})
     senderCnpj: string;
 
-    @Column()
+    @Column({name: "sender_corporate_name"})
     senderCorporateName: string;
 
-    @Column()
+    @Column({name: "receiver_cnpj"})
     receiverCnpj: string;
 
-    @Column()
+    @Column({name: "receiver_corporate_name"})
     receiverCorporateName: string;
 }
