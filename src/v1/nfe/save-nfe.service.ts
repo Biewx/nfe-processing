@@ -18,13 +18,13 @@ export class SaveNfeService {
 
     private parseXml = (result: any) : NfeDto => {
         return {
-            numero: result.nota?.numero[0],
+            number: result.nota?.numero[0],
             issuedAt: new Date(result.nota?.dataEmissao[0]),
             senderCnpj: result.nota?.emitente?.[0]?.cnpj[0],
             senderCorporateName: result.nota?.emitente?.[0]?.razaoSocial[0],
             receiverCnpj: result.nota?.destinatario?.[0]?.cnpj[0],
             receiverCorporateName: result.nota?.destinatario?.[0]?.razaoSocial[0],
-            produtos: result.nota?.produtos[0]?.produto.map((produto) => ({
+            products: result.nota?.produtos[0]?.produto.map((produto) => ({
                 code: produto.codigo[0],
                 name: produto.nome[0],
                 quantity: Number(produto.quantidade[0]),
@@ -45,14 +45,14 @@ export class SaveNfeService {
 
     private mapToEntity = (nfeDto: NfeDto) => {
         const nfe = new Nfe();
-        nfe.numero = nfeDto.numero;
+        nfe.number = nfeDto.number;
         nfe.issuedAt = nfeDto.issuedAt;
         nfe.senderCnpj = nfeDto.senderCnpj;
         nfe.senderCorporateName = nfeDto.senderCorporateName;
         nfe.receiverCnpj = nfeDto.receiverCnpj;
         nfe.receiverCorporateName = nfeDto.receiverCorporateName;
-        nfe.valorTotal = this.calculateTotal(nfeDto.produtos);
-        nfe.products = nfeDto.produtos.map(produtoDto => {
+        nfe.totalValue = this.calculateTotal(nfeDto.products);
+        nfe.products = nfeDto.products.map(produtoDto => {
             const product = new Product();
             product.code = produtoDto.code;
             product.name = produtoDto.name;
@@ -65,9 +65,9 @@ export class SaveNfeService {
         return nfe;
     }
 
-    private findByNumber = (numero: string) => {
+    private findByNumber = (number: string) => {
         const nfe = this.nfeRepository
-        .findOneBy({ numero })
+        .findOneBy({ number })
 
         return nfe;
     }
@@ -78,7 +78,7 @@ export class SaveNfeService {
         
         const nota = this.parseXml(result);
 
-        const exists = await this.findByNumber(nota.numero)
+        const exists = await this.findByNumber(nota.number)
         
         const nfe = this.mapToEntity(nota);
 
@@ -89,7 +89,7 @@ export class SaveNfeService {
         await this.nfeRepository.save(nfe);
 
         return {
-            "message": "Nfe salva com sucesso!"
+            "message": "Nfe salva com sucesso!",
         };
     }
 }

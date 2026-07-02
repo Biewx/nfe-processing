@@ -5,18 +5,18 @@ import { Type } from "class-transformer";
 export default class NfeDto {
 
     @IsString()
-    numero: string;
+    number: string;
 
     @IsDate()
     issuedAt: Date;
 
     @IsNumber()
-    valorTotal?: number;
+    totalValue?: number;
 
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => ProdutoDto)
-    produtos: ProdutoDto[];
+    products: ProdutoDto[];
 
     @IsString()
     senderCnpj: string

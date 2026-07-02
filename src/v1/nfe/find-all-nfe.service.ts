@@ -17,10 +17,10 @@ export default class FindAllNfeService {
         const dto = new NfeSummaryResponseDto();
             dto.id = nfe.id;
             dto.issuedAt = nfe.issuedAt;
-            dto.number = nfe.numero;
+            dto.number = nfe.number;
             dto.sender = nfe.senderCorporateName;
             dto.receiver = nfe.receiverCorporateName;
-            dto.totalValue = nfe.valorTotal;
+            dto.totalValue = nfe.totalValue;
             dto.products = nfe.products.map(p => {
                 const productDto = new ProductResponseDto();
     

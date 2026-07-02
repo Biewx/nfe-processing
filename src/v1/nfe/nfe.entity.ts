@@ -7,7 +7,7 @@ export class Nfe {
     id: number; 
 
     @Column()
-    numero: string;
+    number: string;
 
     @Column({
         name: 'issued_at',
@@ -16,12 +16,12 @@ export class Nfe {
     issuedAt: Date;
 
     @Column({
-        name: "valor_total",
+        name: "total_value",
         type: "numeric",
         precision: 10,
         scale: 2,
     })
-    valorTotal: number;
+    totalValue: number;
 
     @CreateDateColumn({
         name: "created_at",

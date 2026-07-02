@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Invoice{
+  @@map("invoices")
+  id Int @id @default(autoincrement())
+  accessKey String @unique
+  number Int
+  series Int
+  issuedAt DateTime
+  operationNature String @db.VarChar(60)
+  totalValue Decimal @db.Decimal(15, 2)
+  supplierId Int
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+  items InvoiceItem[]
+  xmlStorageKey String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model InvoiceItem{
+  @@map("invoice_items")
+  id Int @id @default(autoincrement())
+  code String @db.VarChar(60)
+  description String @db.VarChar(120)
+  ncm String @db.VarChar(8)
+  commercialUnit String @db.VarChar(10)
+  cfop String @db.VarChar(4)
+  quantity Decimal @db.Decimal(15, 2)
+  unitPrice Decimal @db.Decimal(15, 2)
+  totalPrice Decimal @db.Decimal(15, 2)
+  icmsValue Decimal @db.Decimal(15, 2)
+  pisValue Decimal @db.Decimal(15, 2)
+  cofinsValue Decimal @db.Decimal(15, 2)
+  invoiceId Int
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Supplier{
+  @@map("suppliers")
+  id Int @id @default(autoincrement())
+  cnpj String @unique @db.Char(14)
+  legalName String @db.VarChar(120)
+  tradeName String? @db.VarChar(120)
+  stateRegistration String? @db.VarChar(60)
+  city String @db.VarChar(60)
+  state String @db.Char(2)
+  invoices Invoice[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
