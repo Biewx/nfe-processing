@@ -1,19 +1,35 @@
 import { Injectable } from "@nestjs/common";
+import { error } from "console";
 
 @Injectable()
 export default class NfeMapperService {
+    private getInfNfe(xmlData: any){
+        return (
+            xmlData?.Nfe?.infNfe?.[0] ??
+            xmlData?.nfeProc?.NFe?.[0]?.infNFe?.[0]
+        );
+    }
+
     map(xmlData: any) {
-       return {
+        const infNFe = this.getInfNfe(xmlData)
+
+        if (!infNFe){
+            throw new Error("Estrutura de NFe não conhceida!")
+        }
+
+        const emit = infNFe.emit?.[0];
+
+        return {
             "invoice":{
-                accessKey: xmlData?.NFe?.infNFe?.[0]?.$.Id?.replace("NFe", ""),
-                number: Number(xmlData?.NFe?.infNFe?.[0]?.ide?.[0]?.nNF?.[0]),
-                series: Number(xmlData?.NFe?.infNFe?.[0]?.ide?.[0]?.serie?.[0]),
-                issuedAt: new Date(xmlData?.NFe?.infNFe?.[0]?.ide?.[0]?.dhEmi?.[0]),
-                operationNature: xmlData?.NFe?.infNFe?.[0]?.ide?.[0]?.natOp?.[0],
-                totalValue: xmlData?.NFe?.infNFe?.[0]?.total?.[0]?.ICMSTot?.[0]?.vNF?.[0]
+                accessKey: infNFe.$?.Id?.replace("NFe", ""),
+                number: Number(infNFe.ide?.[0]?.nNF?.[0]),
+                series: Number(infNFe.ide?.[0]?.serie?.[0]),
+                issuedAt: new Date(infNFe.ide?.[0]?.dhEmi?.[0]),
+                operationNature: infNFe.ide?.[0]?.natOp?.[0],
+                totalValue: infNFe.total?.[0]?.ICMSTot?.[0]?.vNF?.[0]
             },
             
-            "invoiceItems": xmlData?.NFe?.infNFe?.[0]?.det?.map((item) => ({
+            "invoiceItems": infNFe.det?.map((item) => ({
                     code: item?.prod?.[0]?.cProd?.[0],
                     description: item?.prod?.[0]?.xProd?.[0],
                     ncm: item?.prod?.[0]?.NCM?.[0],
@@ -28,12 +44,12 @@ export default class NfeMapperService {
             })),
 
             "supplier": {
-                cnpj: xmlData?.NFe?.infNFe?.[0]?.emit?.[0]?.CNPJ?.[0],
-                legalName: xmlData?.NFe?.infNFe?.[0]?.emit?.[0]?.xNome?.[0],
-                tradeName: xmlData?.NFe?.infNFe?.[0]?.emit?.[0]?.xFant?.[0],
-                stateRegistration: xmlData?.NFe?.infNFe?.[0]?.emit?.[0]?.IE?.[0],
-                city: xmlData?.NFe?.infNFe?.[0]?.emit?.[0]?.enderEmit?.[0]?.xMun?.[0],
-                state: xmlData?.NFe?.infNFe?.[0]?.emit?.[0]?.enderEmit?.[0]?.UF?.[0],
+                cnpj: emit.CNPJ?.[0],
+                legalName: emit.xNome?.[0],
+                tradeName: emit.xFant?.[0],
+                stateRegistration: emit.IE?.[0],
+                city: emit.enderEmit?.[0]?.xMun?.[0],
+                state: emit.enderEmit?.[0]?.UF?.[0],
             }
        }
     }
