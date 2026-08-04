@@ -52,7 +52,6 @@ npx prisma migrate dev # nova migration
 
 ## Débitos conhecidos (não corrigir silenciosamente — discutir antes)
 
-- `GetMonthComparisionService` (`insights`) tem um bug: `months` é declarado como objeto `{}` mas usado como array (`.map`). Feature incompleta.
 - `main.ts` registra `useGlobalPipes` depois de `app.listen()` — ordem errada.
 - `FiltersDto` não tem decorators de `class-validator`, então o `ValidationPipe({ transform: true })` global não está fazendo a coerção/validação que parece fazer.
 - `CreateInvoiceService` lança `Error` genérico para invoice duplicada em vez de uma exception do Nest (`ConflictException`), então o client recebe 500 em vez de 409.
