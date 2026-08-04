@@ -44,6 +44,8 @@ model InvoiceItem{
   cofinsValue Decimal? @db.Decimal(15, 2)
   invoiceId Int
   invoice Invoice @relation(fields: [invoiceId], references: [id])
+  productId Int?
+  product Product? @relation(fields: [productId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -58,6 +60,16 @@ model Supplier{
   city String @db.VarChar(60)
   state String @db.Char(2)
   invoices Invoice[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product{
+  @@map("products")
+  id Int @id @default(autoincrement())
+  description String @db.VarChar(120)
+  invoiceItems InvoiceItem[]
+  ean String? @db.VarChar(14) @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

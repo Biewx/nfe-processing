@@ -33,6 +33,7 @@ export default class NfeMapperService {
                     code: item?.prod?.[0]?.cProd?.[0],
                     description: item?.prod?.[0]?.xProd?.[0],
                     ncm: item?.prod?.[0]?.NCM?.[0],
+                    ean: item?.prod?.[0]?.cEAN?.[0],
                     commercialUnit: item?.prod?.[0]?.uCom?.[0],
                     cfop: item?.prod?.[0]?.CFOP?.[0],
                     quantity: item?.prod?.[0]?.qCom?.[0],

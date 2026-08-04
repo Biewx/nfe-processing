@@ -9,6 +9,8 @@ import InvoiceRepository from "./repositories/invoice.repository";
 import CreateInvoiceService from "./services/create-invoice.service";
 import CreateInvoiceItemService from "../invoice-item/services/create-invoice-item.service";
 import InvoiceItemRepository from "../invoice-item/repositories/invoice-item.repository";
+import CreateProductIfNotExistsService from "../product/services/create-product-if-not-exists.service";
+import ProductRepository from "../product/repositories/product.repository";
 
 @Module({
     imports: [PrismaModule],
@@ -21,7 +23,9 @@ import InvoiceItemRepository from "../invoice-item/repositories/invoice-item.rep
         InvoiceRepository,
         CreateInvoiceService,
         InvoiceItemRepository,
-        CreateInvoiceItemService
+        CreateInvoiceItemService,
+        CreateProductIfNotExistsService,
+        ProductRepository
     ]
 })
 export class InvoiceModule {}

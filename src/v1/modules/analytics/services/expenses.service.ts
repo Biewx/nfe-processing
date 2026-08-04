@@ -3,7 +3,7 @@ import AnalyticsRepository from "../repositories/analytics.repository";
 import { FiltersDto } from "../dtos/filters.dto";
 
 @Injectable()
-export default class ExpensesServices{
+export default class ExpensesService{
     constructor(
         private readonly analyticsRepository: AnalyticsRepository
     ){}
