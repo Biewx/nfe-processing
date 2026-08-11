@@ -23,15 +23,13 @@ Aja como um **professor/mentor**, não apenas como alguém que executa tarefas:
 - **NestJS 11** + TypeScript
 - **Prisma 7** (Postgres) — ORM atual
 - `xml2js` para parsing do XML da NFe
-- `class-validator` / `class-transformer` para DTOs (parcialmente adotado — ver "Débitos conhecidos")
+- `class-validator` / `class-transformer` para DTOs
 - Jest para testes
 
 ## Arquitetura
 
-Há **duas gerações de código convivendo** no repo, fruto de uma migração TypeORM → Prisma:
+Todo o código ativo vive em `src/v1/modules/*`, baseado em Prisma (a geração anterior, em TypeORM, foi removida):
 
-- **`src/v1/nfe/*`, `src/v1/product/*`, `src/data-source.ts`** — geração antiga, baseada em TypeORM. **Não está mais registrada em `app.module.ts`** — é código morto. Antes de tocar nesses arquivos, confirme com Gabriel se é para remover ou se ainda serve de referência.
-- **`src/v1/modules/*`** — geração atual, baseada em Prisma. É onde o desenvolvimento ativo acontece:
   - `invoice`, `invoice-item`, `supplier` — ingestão e persistência das notas (upload XML → parse → grava no banco).
   - `analytics` — consultas agregadas (gastos totais, maior gasto, top fornecedores, produto mais vendido).
   - `insights` — camada de inteligência sobre analytics (ex.: comparação mês a mês). Módulo novo e ainda incompleto — é onde a "inteligência de compras" deve crescer.
@@ -52,7 +50,4 @@ npx prisma migrate dev # nova migration
 
 ## Débitos conhecidos (não corrigir silenciosamente — discutir antes)
 
-- `main.ts` registra `useGlobalPipes` depois de `app.listen()` — ordem errada.
-- `FiltersDto` não tem decorators de `class-validator`, então o `ValidationPipe({ transform: true })` global não está fazendo a coerção/validação que parece fazer.
-- `CreateInvoiceService` lança `Error` genérico para invoice duplicada em vez de uma exception do Nest (`ConflictException`), então o client recebe 500 em vez de 409.
-- Módulo TypeORM legado (`src/v1/nfe`, `src/v1/product`) é código morto — candidato a remoção, mas confirmar com Gabriel antes.
+Nenhum no momento — os débitos anteriores (ordem do `useGlobalPipes`, `FiltersDto` sem `class-validator`, `CreateInvoiceService` lançando `Error` genérico, módulo TypeORM legado) foram resolvidos em 2026-08-11.
