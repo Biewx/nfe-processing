@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "prisma/prisma.service";
+import { FiltersDto } from "../../analytics/dtos/filters.dto";
 
 @Injectable()
 export default class InsightsRepository {
@@ -36,5 +37,33 @@ export default class InsightsRepository {
                 },
             },
         });
+    }
+
+    async findPurchaseHistoryByProduct(params: FiltersDto) {
+        const history = await this.prisma.invoiceItem.findMany({    
+            select: {
+                unitPrice: true,
+                invoice: {
+                    select: {
+                        supplier: {
+                            select: {
+                                id: true,
+                                legalName: true
+                            }
+                        },
+                        issuedAt: true
+                    }
+                },
+            },
+            orderBy:{
+                invoice: {
+                    issuedAt: 'desc'
+                }
+            },
+            where: {
+                    productId: params.productId
+                }
+        })
+        return history
     }
 }
