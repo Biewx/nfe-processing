@@ -16,15 +16,18 @@ export default class InvoiceRepository {
         return invoiceExists;
     }
 
-    async createInvoice(dto: InvoiceDto, supplierId: number) {
-        console.log(dto);
-        console.log(supplierId);
+    async createInvoice(dto: InvoiceDto, supplierId: number, companyId: number) {
         const invoice = await this.prisma.invoice.create({
             data:{
                 ...dto,
                 supplier:{
                     connect:{
                         id: supplierId,
+                    },
+                },
+                company:{
+                    connect:{
+                        id: companyId,
                     },
                 },
             },

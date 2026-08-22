@@ -4,6 +4,7 @@ import GetMonthComparisionService from "./get-month-comparision.service";
 describe("GetMonthComparisionService", () => {
     let service: GetMonthComparisionService;
     let fakeExpensesService: { getTotalExpenses: jest.Mock };
+    const companyId = 99;
 
     beforeEach(() => {
         // repara que fakeExpensesService é criado aqui e usado pra construir o
@@ -21,7 +22,7 @@ describe("GetMonthComparisionService", () => {
         // qualquer chamada a getTotalExpenses
 
         // Act + Assert
-        await expect(service.getMonthComparision({})).rejects.toThrow(BadRequestException);
+        await expect(service.getMonthComparision({}, companyId)).rejects.toThrow(BadRequestException);
         expect(fakeExpensesService.getTotalExpenses).not.toHaveBeenCalled();
     });
 
@@ -37,7 +38,7 @@ describe("GetMonthComparisionService", () => {
             .mockResolvedValueOnce(50); // mês -3
 
         // Act
-        const result = await service.getMonthComparision({ month: 1, year: 2023 });
+        const result = await service.getMonthComparision({ month: 1, year: 2023 }, companyId);
 
         // Assert
         // previousAverage = (50 + 50 + 50) / 3 = 50
@@ -60,7 +61,7 @@ describe("GetMonthComparisionService", () => {
             .mockResolvedValueOnce(80); // mês -3
 
         // Act
-        const result = await service.getMonthComparision({ month: 1, year: 2023 });
+        const result = await service.getMonthComparision({ month: 1, year: 2023 }, companyId);
 
         // Assert
         // previousAverage = (80 + 80 + 80) / 3 = 80
@@ -79,7 +80,7 @@ describe("GetMonthComparisionService", () => {
             .mockResolvedValueOnce(60);
 
         // Act
-        const result = await service.getMonthComparision({ month: 1, year: 2023 });
+        const result = await service.getMonthComparision({ month: 1, year: 2023 }, companyId);
 
         // Assert: percentageChange deve dar exatamente 0
         expect(result.percentageChange).toBe(0);
@@ -97,7 +98,7 @@ describe("GetMonthComparisionService", () => {
             .mockResolvedValueOnce(0); // mês -3
 
         // Act
-        const result = await service.getMonthComparision({ month: 1, year: 2023 });
+        const result = await service.getMonthComparision({ month: 1, year: 2023 }, companyId);
 
         // Assert
         expect(result.previousAverage).toBe(0);

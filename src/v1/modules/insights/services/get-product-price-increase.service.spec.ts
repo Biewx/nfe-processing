@@ -4,6 +4,7 @@ import GetProductPriceIncreaseService from "./get-product-price-increase.service
 describe("GetProductPriceIncreaseService", () => {
     let service: GetProductPriceIncreaseService;
     let fakeRepository: { findPurchaseHistoryByProduct: jest.Mock };
+    const companyId = 99;
 
     beforeEach(() => {
         fakeRepository = {
@@ -17,7 +18,7 @@ describe("GetProductPriceIncreaseService", () => {
         // qualquer chamada ao repository
 
         // Act + Assert
-        await expect(service.getProductPriceIncrease({})).rejects.toThrow(BadRequestException);
+        await expect(service.getProductPriceIncrease({}, companyId)).rejects.toThrow(BadRequestException);
         expect(fakeRepository.findPurchaseHistoryByProduct).not.toHaveBeenCalled();
     });
 
@@ -32,7 +33,7 @@ describe("GetProductPriceIncreaseService", () => {
         ]);
 
         // Act
-        const result = await service.getProductPriceIncrease({ productId: 1 });
+        const result = await service.getProductPriceIncrease({ productId: 1 }, companyId);
 
         // Assert
         // previousAverage = (51 + 50 + 50) / 3 = 50.33
@@ -53,7 +54,7 @@ describe("GetProductPriceIncreaseService", () => {
         ]);
 
         // Act
-        const result = await service.getProductPriceIncrease({ productId: 1 });
+        const result = await service.getProductPriceIncrease({ productId: 1 }, companyId);
 
         // Assert: (51 - 50) / 50 * 100 = 2%
         expect(result[1].percentageChange).toBe(2);
@@ -69,7 +70,7 @@ describe("GetProductPriceIncreaseService", () => {
         ]);
 
         // Act
-        const result = await service.getProductPriceIncrease({ productId: 1 });
+        const result = await service.getProductPriceIncrease({ productId: 1 }, companyId);
 
         // Assert: (40 - 50) / 50 * 100 = -20%
         expect(result[1].percentageChange).toBe(-20);
@@ -83,7 +84,7 @@ describe("GetProductPriceIncreaseService", () => {
         ]);
 
         // Act
-        const result = await service.getProductPriceIncrease({ productId: 1 });
+        const result = await service.getProductPriceIncrease({ productId: 1 }, companyId);
 
         // Assert
         expect(result[1].lastPrice).toBe(40);
@@ -103,7 +104,7 @@ describe("GetProductPriceIncreaseService", () => {
         ]);
 
         // Act
-        const result = await service.getProductPriceIncrease({ productId: 1 });
+        const result = await service.getProductPriceIncrease({ productId: 1 }, companyId);
 
         // Assert: fornecedor A subiu 100%, fornecedor B ficou estável
         expect(result[1].supplier).toBe("Fornecedor A");

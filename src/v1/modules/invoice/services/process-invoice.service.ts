@@ -16,12 +16,12 @@ export default class ProcessInvoiceService {
         private readonly createProductIfNotExistsService: CreateProductIfNotExistsService
     ) {}
 
-    async processXml(file: any) {
+    async processXml(file: any, companyId: number) {
         const xmlContent = file.buffer.toString('utf-8');
         const stringXml = await parseStringPromise(xmlContent);
         const parsedData = this.mapperService.map(stringXml);
         const supplier = await this.createSupplierIfNotExistsService.createSupplierIfNotExists(parsedData.supplier);
-        const invoice = await this.createInvoiceService.createInvoiceIfNotExists(parsedData.invoice, supplier.id);
+        const invoice = await this.createInvoiceService.createInvoiceIfNotExists(parsedData.invoice, supplier.id, companyId);
         const products = await this.createProductIfNotExistsService.createProductIfNotExists(parsedData.invoiceItems);
 
         for (let i = 0; i < parsedData.invoiceItems.length; i++) {

@@ -13,8 +13,8 @@ export default class GetSavingsOpportunitiesService {
     // GetBestSupplierService: "nesse mês, qual era o fornecedor mais barato
     // pra esse produto?". Se a resposta for diferente de quem realmente
     // vendeu, é uma oportunidade de economia perdida.
-    async getSavingsOpportunities() {
-        const latestPurchases = await this.insightsRepository.findLatestPurchasePerProduct();
+    async getSavingsOpportunities(companyId: number) {
+        const latestPurchases = await this.insightsRepository.findLatestPurchasePerProduct(companyId);
 
         const opportunities: any[] = [];
 
@@ -31,7 +31,7 @@ export default class GetSavingsOpportunitiesService {
                 productId: purchase.productId as number,
                 month,
                 year,
-            });
+            }, companyId);
 
             // sem pelo menos 2 fornecedores comparados nesse mês, não existe
             // recomendação de verdade -- não dá pra dizer que perdeu dinheiro

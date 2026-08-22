@@ -11,14 +11,14 @@ export default class GetMonthComparisionService {
         private readonly expensesService: ExpensesService
     ) {}
 
-    async getMonthComparision(params: FiltersDto) {
+    async getMonthComparision(params: FiltersDto, companyId: number) {
         if (!params.month || !params.year) {
             throw new BadRequestException("Os parâmetros 'month' e 'year' são obrigatórios.");
         }
 
         const offsets = Array.from({ length: MONTHS_IN_BASELINE + 1 }, (_, offset) => offset);
         const [currentTotal, ...previousTotals] = await Promise.all(
-            offsets.map((offset) => this.getExpensesForOffset(params, offset)),
+            offsets.map((offset) => this.getExpensesForOffset(params, offset, companyId)),
         );
 
         const previousAverage = previousTotals.reduce((sum, value) => sum + value, 0) / MONTHS_IN_BASELINE;
@@ -34,13 +34,13 @@ export default class GetMonthComparisionService {
         };
     }
 
-    private async getExpensesForOffset(params: FiltersDto, offset: number) {
+    private async getExpensesForOffset(params: FiltersDto, offset: number, companyId: number) {
         const reference = new Date(Number(params.year), Number(params.month) - 1 - offset, 1);
         const total = await this.expensesService.getTotalExpenses({
             ...params,
             month: reference.getMonth() + 1,
             year: reference.getFullYear(),
-        });
+        }, companyId);
         return Number(total ?? 0);
     }
 

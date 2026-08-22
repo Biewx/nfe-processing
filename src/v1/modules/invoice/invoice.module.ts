@@ -11,6 +11,7 @@ import CreateInvoiceItemService from "../invoice-item/services/create-invoice-it
 import InvoiceItemRepository from "../invoice-item/repositories/invoice-item.repository";
 import CreateProductIfNotExistsService from "../product/services/create-product-if-not-exists.service";
 import ProductRepository from "../product/repositories/product.repository";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 @Module({
     imports: [PrismaModule],
@@ -25,7 +26,8 @@ import ProductRepository from "../product/repositories/product.repository";
         InvoiceItemRepository,
         CreateInvoiceItemService,
         CreateProductIfNotExistsService,
-        ProductRepository
+        ProductRepository,
+        JwtAuthGuard
     ]
 })
 export class InvoiceModule {}

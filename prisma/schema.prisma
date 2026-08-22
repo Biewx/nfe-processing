@@ -24,6 +24,32 @@ model Invoice{
   supplier Supplier @relation(fields: [supplierId], references: [id])
   items InvoiceItem[]
   xmlStorageKey String?
+  // dono da nota -- é aqui que o isolamento entre empresas acontece de
+  // verdade. Supplier/Product continuam globais (catálogo compartilhado);
+  // quem comprou o quê, por quanto, mora na Invoice.
+  companyId Int
+  company Company @relation(fields: [companyId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Company{
+  @@map("companies")
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(120)
+  invoices Invoice[]
+  users User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User{
+  @@map("users")
+  id Int @id @default(autoincrement())
+  email String @unique
+  passwordHash String
+  companyId Int
+  company Company @relation(fields: [companyId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

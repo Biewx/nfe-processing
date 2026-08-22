@@ -11,7 +11,7 @@ export default class InsightsRepository {
     // Traz todas as compras de um produto dentro de uma janela de datas, já com
     // o fornecedor de cada uma. Não decide "qual é o melhor" aqui — isso é
     // regra de negócio, fica por conta do service. O repository só busca dado.
-    async findPurchasesByProductInRange(productId: number, start: Date, end: Date) {
+    async findPurchasesByProductInRange(productId: number, start: Date, end: Date, companyId: number) {
         return this.prisma.invoiceItem.findMany({
             select: {
                 unitPrice: true,
@@ -30,6 +30,7 @@ export default class InsightsRepository {
             where: {
                 productId,
                 invoice: {
+                    companyId,
                     issuedAt: {
                         gte: start,
                         lte: end,
@@ -39,7 +40,7 @@ export default class InsightsRepository {
         });
     }
 
-    async findPurchaseHistoryByProduct(params: FiltersDto) {
+    async findPurchaseHistoryByProduct(params: FiltersDto, companyId: number) {
         const history = await this.prisma.invoiceItem.findMany({
             select: {
                 unitPrice: true,
@@ -61,7 +62,8 @@ export default class InsightsRepository {
                 }
             },
             where: {
-                    productId: params.productId
+                    productId: params.productId,
+                    invoice: { companyId },
                 }
         })
         return history
@@ -72,10 +74,11 @@ export default class InsightsRepository {
     // Prisma manter só o primeiro registro de cada productId na ordem dada —
     // como a ordem é "mais recente primeiro", o primeiro de cada produto já
     // é o mais recente.
-    async findLatestPurchasePerProduct() {
+    async findLatestPurchasePerProduct(companyId: number) {
         return this.prisma.invoiceItem.findMany({
             where: {
                 productId: { not: null },
+                invoice: { companyId },
             },
             distinct: ['productId'],
             orderBy: {

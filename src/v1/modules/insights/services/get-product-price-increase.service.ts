@@ -12,12 +12,12 @@ export default class GetProductPriceIncreaseService {
         private readonly insightsRepository: InsightsRepository
     ) {}
 
-    async getProductPriceIncrease(params: FiltersDto) {
+    async getProductPriceIncrease(params: FiltersDto, companyId: number) {
         if (!params.productId) {
             throw new BadRequestException("Product ID is required");
         }
 
-        const history = await this.insightsRepository.findPurchaseHistoryByProduct(params);
+        const history = await this.insightsRepository.findPurchaseHistoryByProduct(params, companyId);
 
         // agrupa as compras por fornecedor -- cada fornecedor tem seu proprio
         // historico de preco, entao nao faz sentido comparar preco de um com

@@ -19,7 +19,7 @@ export default class GetBestSupplierService {
         private readonly insightsRepository: InsightsRepository
     ) {}
 
-    async getBestSupplier(params: FiltersDto) {
+    async getBestSupplier(params: FiltersDto, companyId: number) {
         if (!params.productId) {
             throw new BadRequestException("Product ID is required");
         }
@@ -29,6 +29,7 @@ export default class GetBestSupplierService {
             Number(params.productId),
             start,
             end,
+            companyId,
         );
 
         if (purchases.length === 0) {

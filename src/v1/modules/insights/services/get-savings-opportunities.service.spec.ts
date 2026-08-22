@@ -4,6 +4,7 @@ describe("GetSavingsOpportunitiesService", () => {
     let service: GetSavingsOpportunitiesService;
     let fakeRepository: { findLatestPurchasePerProduct: jest.Mock };
     let fakeBestSupplierService: { getBestSupplier: jest.Mock };
+    const companyId = 99;
 
     beforeEach(() => {
         fakeRepository = {
@@ -23,7 +24,7 @@ describe("GetSavingsOpportunitiesService", () => {
         fakeRepository.findLatestPurchasePerProduct.mockResolvedValue([]);
 
         // Act
-        const result = await service.getSavingsOpportunities();
+        const result = await service.getSavingsOpportunities(companyId);
 
         // Assert
         expect(result).toEqual([]);
@@ -55,14 +56,14 @@ describe("GetSavingsOpportunitiesService", () => {
         });
 
         // Act
-        const result = await service.getSavingsOpportunities();
+        const result = await service.getSavingsOpportunities(companyId);
 
         // Assert
         expect(fakeBestSupplierService.getBestSupplier).toHaveBeenCalledWith({
             productId: 1,
             month: 7,
             year: 2026,
-        });
+        }, companyId);
         expect(result).toEqual([
             {
                 product: "Papel A4",
@@ -101,7 +102,7 @@ describe("GetSavingsOpportunitiesService", () => {
         });
 
         // Act
-        const result = await service.getSavingsOpportunities();
+        const result = await service.getSavingsOpportunities(companyId);
 
         // Assert
         expect(result).toEqual([]);
@@ -132,7 +133,7 @@ describe("GetSavingsOpportunitiesService", () => {
         });
 
         // Act
-        const result = await service.getSavingsOpportunities();
+        const result = await service.getSavingsOpportunities(companyId);
 
         // Assert
         expect(result).toEqual([]);
@@ -164,7 +165,7 @@ describe("GetSavingsOpportunitiesService", () => {
         });
 
         // Act
-        const result = await service.getSavingsOpportunities();
+        const result = await service.getSavingsOpportunities(companyId);
 
         // Assert
         expect(result).toEqual([]);
@@ -215,7 +216,7 @@ describe("GetSavingsOpportunitiesService", () => {
             });
 
         // Act
-        const result = await service.getSavingsOpportunities();
+        const result = await service.getSavingsOpportunities(companyId);
 
         // Assert: só o Papel A4 vira oportunidade
         expect(result).toHaveLength(1);

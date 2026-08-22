@@ -10,7 +10,11 @@ export default class CreateInvoiceService {
         private readonly invoiceRepository: InvoiceRepository
     ) {}
 
-    async createInvoiceIfNotExists(invoice, supplier) {
+    async createInvoiceIfNotExists(invoice, supplier, companyId: number) {
+        // accessKey é o identificador da NFe de verdade, emitido pela SEFAZ --
+        // é único no mundo real, então essa checagem continua global (não
+        // por empresa): a mesma nota fiscal não pode existir duas vezes no
+        // sistema, não importa quem fez o upload.
         const invoiceExists = await this.invoiceRepository.findByInvoiceNumber(invoice.accessKey);
         if (invoiceExists) {
             // ConflictException vira 409 automaticamente (o Nest sabe converter
@@ -20,7 +24,7 @@ export default class CreateInvoiceService {
             // invoice duplicada de propósito ou por engano.
             throw new ConflictException(`Invoice with access key ${invoice.accessKey} already exists.`);
         }
-        const newInvoice = await this.invoiceRepository.createInvoice(invoice, supplier);
+        const newInvoice = await this.invoiceRepository.createInvoice(invoice, supplier, companyId);
         return newInvoice;
     }
 }

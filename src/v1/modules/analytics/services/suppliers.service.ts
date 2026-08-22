@@ -10,8 +10,8 @@ export default class SuppliersService{
         private readonly analyticsRepository: AnalyticsRepository
     ){}
 
-    async getTopSellerSuppliers(params: FiltersDto){
-        const where: any = {};
+    async getTopSellerSuppliers(params: FiltersDto, companyId: number){
+        const where: any = { companyId };
 
         if (params.month && params.year){
             where.issuedAt ={

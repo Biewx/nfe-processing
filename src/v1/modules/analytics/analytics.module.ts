@@ -6,6 +6,7 @@ import { PrismaService } from "prisma/prisma.service";
 import ExpensesServices from "./services/expenses.service";
 import SuppliersService from "./services/suppliers.service";
 import ProductsService from "./services/products.service";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 @Module({
     imports: [],
@@ -15,7 +16,8 @@ import ProductsService from "./services/products.service";
         SuppliersService,
         ProductsService,
         AnalyticsRepository,
-        PrismaService
+        PrismaService,
+        JwtAuthGuard
     ]
 })
 export class AnalyticsModule {}

@@ -33,7 +33,7 @@ describe("SuppliersService", () => {
         ]);
 
         // Act
-        const result = await service.getTopSellerSuppliers({});
+        const result = await service.getTopSellerSuppliers({}, 99);
 
         // Assert: fornecedor 1 gastou 500 de 1000 no total = 50%;
         // fornecedor 2 gastou 300 de 1000 = 30%.
@@ -56,7 +56,7 @@ describe("SuppliersService", () => {
         ]);
 
         // Act
-        await service.getTopSellerSuppliers({});
+        await service.getTopSellerSuppliers({}, 99);
 
         // Assert: getSuppliersById precisa ser chamado com a lista de ids que
         // vieram de getSupplierExpenses, não com todos os fornecedores

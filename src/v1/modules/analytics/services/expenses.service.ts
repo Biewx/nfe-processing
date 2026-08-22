@@ -8,8 +8,12 @@ export default class ExpensesService{
         private readonly analyticsRepository: AnalyticsRepository
     ){}
     
-    async getTotalExpenses(params: FiltersDto){
-        const where: any = {};
+    async getTotalExpenses(params: FiltersDto, companyId: number){
+        // companyId nunca vem do query string do client -- só do usuário
+        // autenticado (o controller extrai isso do token, não da URL). Se
+        // viesse da URL, qualquer um poderia trocar ?companyId=5 e ver o
+        // gasto de outra empresa.
+        const where: any = { companyId };
 
         if (params.supplierId){
             where.supplierId = Number(params.supplierId)
@@ -26,8 +30,8 @@ export default class ExpensesService{
         return result;
     }
 
-    async getHighestExpenses(params: FiltersDto){
-        const where: any = {};
+    async getHighestExpenses(params: FiltersDto, companyId: number){
+        const where: any = { companyId };
         if (params.supplierId){
             where.supplierId = Number(params.supplierId)
         }

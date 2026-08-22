@@ -8,6 +8,7 @@ import GetBestSupplierService from "./services/get-best-supplier.service";
 import InsightsRepository from "./repositories/insights.repository";
 import GetProductPriceIncreaseService from "./services/get-product-price-increase.service";
 import GetSavingsOpportunitiesService from "./services/get-savings-opportunities.service";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 @Module({
     imports: [],
@@ -20,7 +21,8 @@ import GetSavingsOpportunitiesService from "./services/get-savings-opportunities
         ExpensesService,
         AnalyticsRepository,
         InsightsRepository,
-        PrismaService
+        PrismaService,
+        JwtAuthGuard
     ]
 })
 export class InsightsModule {}

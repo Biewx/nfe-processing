@@ -67,6 +67,18 @@ function fakeEan(sequence: number): string {
 // Helpers de persistência
 // ---------------------------------------------------------------------------
 
+// Mesma empresa "Empresa Padrão (dados legados)" criada na migration que
+// adicionou multi-tenancy -- assim o dado gerado aqui e o usuário de teste
+// (gabrieljnborba@gmail.com) enxergam o mesmo conjunto de notas.
+async function upsertDefaultCompany() {
+    const name = "Empresa Padrão (dados legados)";
+    const existing = await prisma.company.findFirst({ where: { name } });
+    if (existing) {
+        return existing;
+    }
+    return prisma.company.create({ data: { name } });
+}
+
 async function upsertSupplier(data: {
     cnpj: string;
     legalName: string;
@@ -103,6 +115,7 @@ async function seedInvoiceWithItems(
     supplierId: number,
     issuedAt: Date,
     items: SeedInvoiceItem[],
+    companyId: number,
 ) {
     const accessKey = fakeAccessKey(accessKeySeq);
 
@@ -122,6 +135,7 @@ async function seedInvoiceWithItems(
             operationNature: "Venda de mercadoria",
             totalValue,
             supplierId,
+            companyId,
         },
     });
 
@@ -144,6 +158,8 @@ async function seedInvoiceWithItems(
 }
 
 async function main() {
+    const company = await upsertDefaultCompany();
+
     // -------------------------------------------------------------------
     // PARTE 1 — cenários específicos, escritos à mão pra validar casos-limite
     // exatos (fica fácil de raciocinar sobre o número esperado da query).
@@ -192,16 +208,16 @@ async function main() {
     const arroz = await upsertProduct({ ean: "7896006750014", description: "Arroz Tio João Tipo 1 5kg" });
     await seedInvoiceWithItems(1, atacadao.id, new Date("2026-02-10"), [
         { code: "ARZ001", description: "Arroz Tio João Tipo 1 5kg", commercialUnit: "UN", quantity: 20, unitPrice: 21.9, productId: arroz.id },
-    ]);
+    ], company.id);
     await seedInvoiceWithItems(2, assai.id, new Date("2026-03-05"), [
         { code: "ARZ001", description: "Arroz Tio João Tipo 1 5kg", commercialUnit: "UN", quantity: 20, unitPrice: 24.0, productId: arroz.id },
-    ]);
+    ], company.id);
     await seedInvoiceWithItems(3, atacadao.id, new Date("2026-06-12"), [
         { code: "ARZ001", description: "Arroz Tio João Tipo 1 5kg", commercialUnit: "UN", quantity: 20, unitPrice: 23.5, productId: arroz.id },
-    ]);
+    ], company.id);
     await seedInvoiceWithItems(4, assai.id, new Date("2026-07-20"), [
         { code: "ARZ001", description: "Arroz Tio João Tipo 1 5kg", commercialUnit: "UN", quantity: 20, unitPrice: 22.0, productId: arroz.id },
-    ]);
+    ], company.id);
 
     // Cenário 2: mesmo EAN, unidades comerciais diferentes entre
     // fornecedores — não dá pra comparar unitPrice direto (Carrefour vende
@@ -210,10 +226,10 @@ async function main() {
     const detergente = await upsertProduct({ ean: "7896098700124", description: "Detergente Ypê Neutro 500ml" });
     await seedInvoiceWithItems(5, atacadao.id, new Date("2026-05-15"), [
         { code: "DET010", description: "Detergente Ypê Neutro 500ml", commercialUnit: "UN", quantity: 50, unitPrice: 4.5, productId: detergente.id },
-    ]);
+    ], company.id);
     await seedInvoiceWithItems(6, carrefour.id, new Date("2026-06-01"), [
         { code: "DET010-CX", description: "Detergente Ypê Neutro 500ml (caixa c/12)", commercialUnit: "CX", quantity: 5, unitPrice: 48.0, productId: detergente.id },
-    ]);
+    ], company.id);
 
     // Cenário 3: EAN comprado de um único fornecedor — não há com quem
     // comparar. O insight deve responder "sem comparável", em vez de
@@ -221,7 +237,7 @@ async function main() {
     const feijao = await upsertProduct({ ean: "7891234567895", description: "Feijão Carioca Camil 1kg" });
     await seedInvoiceWithItems(7, assai.id, new Date("2026-04-18"), [
         { code: "FEJ200", description: "Feijão Carioca Camil 1kg", commercialUnit: "UN", quantity: 30, unitPrice: 8.9, productId: feijao.id },
-    ]);
+    ], company.id);
 
     // -------------------------------------------------------------------
     // PARTE 2 — dataset volumoso e gerado: mais fornecedores "visitando" um
@@ -400,7 +416,7 @@ async function main() {
                 });
 
                 accessKeySeq += 1;
-                const result = await seedInvoiceWithItems(accessKeySeq, supplier.id, issuedAt, items);
+                const result = await seedInvoiceWithItems(accessKeySeq, supplier.id, issuedAt, items, company.id);
                 if (result.created) createdInvoices += 1;
                 else skippedInvoices += 1;
             }

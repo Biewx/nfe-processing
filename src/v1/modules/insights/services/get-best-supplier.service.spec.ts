@@ -4,6 +4,7 @@ import GetBestSupplierService from "./get-best-supplier.service";
 describe("getBestSupplierService", () => {
     let service: GetBestSupplierService;
     let fakeRepository: { findPurchasesByProductInRange: jest.Mock };
+    const companyId = 99;
     beforeEach(() => {
         fakeRepository = {
             findPurchasesByProductInRange: jest.fn(),
@@ -12,13 +13,13 @@ describe("getBestSupplierService", () => {
     });
 
     it("lança BadRequestException se productId não for informado", async () =>{
-        await expect(service.getBestSupplier({})).rejects.toThrow(BadRequestException);
+        await expect(service.getBestSupplier({}, companyId)).rejects.toThrow(BadRequestException);
         expect(fakeRepository.findPurchasesByProductInRange).not.toHaveBeenCalled();
     });
 
     it("lança NotFoundException se não houver compras para o produto no período informado", async () =>{
         fakeRepository.findPurchasesByProductInRange.mockResolvedValue([]);
-        await expect(service.getBestSupplier({ productId: "3" })).rejects.toThrow(NotFoundException);
+        await expect(service.getBestSupplier({ productId: "3" }, companyId)).rejects.toThrow(NotFoundException);
         expect(fakeRepository.findPurchasesByProductInRange).toHaveBeenCalled();
     });
 
@@ -35,7 +36,7 @@ describe("getBestSupplierService", () => {
                 invoice: { supplier: { id: 2, legalName: "Outro Nome" } },
             },
         ]);
-        const result = await service.getBestSupplier({ productId: 3 })
+        const result = await service.getBestSupplier({ productId: 3 }, companyId)
         expect(result.unitPrice).toBe(5);
         expect(result.supplier).toBe("Outro Nome");
     });
@@ -48,7 +49,7 @@ describe("getBestSupplierService", () => {
                 invoice: { supplier: { id: 1, legalName: "Nome Aqui" } },
             }
         ]);
-        const result = await service.getBestSupplier({ productId: 3 })
+        const result = await service.getBestSupplier({ productId: 3 }, companyId)
         expect(result.comparable).toBe(false);
     });
 
@@ -70,7 +71,7 @@ describe("getBestSupplierService", () => {
                 invoice: { supplier: { id: 3, legalName: "Supplier3" } },
             }
         ]);
-        const result = await service.getBestSupplier({ productId: 3 })
+        const result = await service.getBestSupplier({ productId: 3 }, companyId)
         expect(result.supplier).toBe("Supplier1");
         expect(result.commercialUnit).toBe("UN");
         expect(result.excludedByUnitMismatch).toBe(1);
