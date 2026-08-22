@@ -40,7 +40,7 @@ export default class InsightsRepository {
     }
 
     async findPurchaseHistoryByProduct(params: FiltersDto) {
-        const history = await this.prisma.invoiceItem.findMany({    
+        const history = await this.prisma.invoiceItem.findMany({
             select: {
                 unitPrice: true,
                 invoice: {
@@ -65,5 +65,42 @@ export default class InsightsRepository {
                 }
         })
         return history
+    }
+
+    // Traz 1 registro por produto: a compra mais recente daquele produto,
+    // não importa de qual fornecedor. "distinct" + "orderBy" juntos fazem o
+    // Prisma manter só o primeiro registro de cada productId na ordem dada —
+    // como a ordem é "mais recente primeiro", o primeiro de cada produto já
+    // é o mais recente.
+    async findLatestPurchasePerProduct() {
+        return this.prisma.invoiceItem.findMany({
+            where: {
+                productId: { not: null },
+            },
+            distinct: ['productId'],
+            orderBy: {
+                invoice: {
+                    issuedAt: 'desc',
+                },
+            },
+            select: {
+                productId: true,
+                description: true,
+                quantity: true,
+                unitPrice: true,
+                commercialUnit: true,
+                invoice: {
+                    select: {
+                        issuedAt: true,
+                        supplier: {
+                            select: {
+                                id: true,
+                                legalName: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
     }
 }

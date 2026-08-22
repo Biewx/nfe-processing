@@ -7,6 +7,7 @@ import { PrismaService } from "prisma/prisma.service";
 import GetBestSupplierService from "./services/get-best-supplier.service";
 import InsightsRepository from "./repositories/insights.repository";
 import GetProductPriceIncreaseService from "./services/get-product-price-increase.service";
+import GetSavingsOpportunitiesService from "./services/get-savings-opportunities.service";
 
 @Module({
     imports: [],
@@ -15,6 +16,7 @@ import GetProductPriceIncreaseService from "./services/get-product-price-increas
         GetMonthComparisionService,
         GetBestSupplierService,
         GetProductPriceIncreaseService,
+        GetSavingsOpportunitiesService,
         ExpensesService,
         AnalyticsRepository,
         InsightsRepository,
