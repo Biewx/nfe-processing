@@ -56,3 +56,6 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 /generated/prisma
+
+# BMad Method - personal install answers (regenerated per machine/user, not team config)
+/_bmad/config.user.toml
