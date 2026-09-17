@@ -23,6 +23,12 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
         InsightsRepository,
         PrismaService,
         JwtAuthGuard
+    ],
+    // monthly-report consome estes services diretamente (AD-1) -- nunca os
+    // redeclara como provider proprio, importa este modulo.
+    exports: [
+        GetSavingsOpportunitiesService,
+        GetProductPriceIncreaseService,
     ]
 })
 export class InsightsModule {}

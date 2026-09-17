@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import InsightsRepository from "../repositories/insights.repository";
 import GetBestSupplierService from "./get-best-supplier.service";
+import { getReferenceMonthWindow } from "../utils/get-reference-month-window";
 
 @Injectable()
 export default class GetSavingsOpportunitiesService {
@@ -13,8 +14,15 @@ export default class GetSavingsOpportunitiesService {
     // GetBestSupplierService: "nesse mês, qual era o fornecedor mais barato
     // pra esse produto?". Se a resposta for diferente de quem realmente
     // vendeu, é uma oportunidade de economia perdida.
-    async getSavingsOpportunities(companyId: number) {
-        const latestPurchases = await this.insightsRepository.findLatestPurchasePerProduct(companyId);
+    //
+    // `month`/`year` são opcionais (AD-3): quando passados, só entram
+    // oportunidades cuja compra mais recente caiu dentro daquele mês -- é o
+    // que o relatório mensal usa, pra nunca citar uma oportunidade de um mês
+    // diferente do anunciado no e-mail. Omitidos, comportamento de sempre
+    // (endpoint `/insights/savings_opportunities` ao vivo não muda).
+    async getSavingsOpportunities(companyId: number, month?: number, year?: number) {
+        const range = month && year ? getReferenceMonthWindow(month, year) : undefined;
+        const latestPurchases = await this.insightsRepository.findLatestPurchasePerProduct(companyId, range);
 
         const opportunities: any[] = [];
 

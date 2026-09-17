@@ -115,4 +115,41 @@ describe("GetProductPriceIncreaseService", () => {
         expect(result[2].percentageChange).toBe(0);
         expect(result[2].alert).toBe(false);
     });
+
+    it("com month/year, não inclui fornecedor cuja compra mais recente ficou fora do mês de referência", async () => {
+        // Arrange: Fornecedor A comprou em agosto (dentro do período);
+        // Fornecedor B só tem histórico de março -- mesmo que isso
+        // representasse um aumento grande, não deve virar alerta de agosto
+        // (achado no code-review: sem esse filtro, um fornecedor sem compra
+        // no período aparecia com um alerta de meses atrás, repetido todo
+        // mês seguinte até ele comprar de novo)
+        fakeRepository.findPurchaseHistoryByProduct.mockResolvedValue([
+            { unitPrice: 55, invoice: { supplier: { id: 1, legalName: "Fornecedor A" }, issuedAt: new Date(2026, 7, 5) } },
+            { unitPrice: 50, invoice: { supplier: { id: 1, legalName: "Fornecedor A" }, issuedAt: new Date(2026, 6, 5) } },
+            { unitPrice: 100, invoice: { supplier: { id: 2, legalName: "Fornecedor B" }, issuedAt: new Date(2026, 2, 10) } },
+            { unitPrice: 50, invoice: { supplier: { id: 2, legalName: "Fornecedor B" }, issuedAt: new Date(2026, 1, 10) } },
+        ]);
+
+        // Act
+        const result = await service.getProductPriceIncrease({ productId: 1, month: 8, year: 2026 }, companyId);
+
+        // Assert
+        expect(result[1]).toBeDefined();
+        expect(result[2]).toBeUndefined();
+    });
+
+    it("sem month/year, preserva o comportamento atual (inclui fornecedor com histórico antigo)", async () => {
+        // Arrange: mesmo cenário do teste acima, mas sem período -- o
+        // endpoint /insights/product_history ao vivo não deve mudar
+        fakeRepository.findPurchaseHistoryByProduct.mockResolvedValue([
+            { unitPrice: 100, invoice: { supplier: { id: 2, legalName: "Fornecedor B" }, issuedAt: new Date(2026, 2, 10) } },
+            { unitPrice: 50, invoice: { supplier: { id: 2, legalName: "Fornecedor B" }, issuedAt: new Date(2026, 1, 10) } },
+        ]);
+
+        // Act
+        const result = await service.getProductPriceIncrease({ productId: 1 }, companyId);
+
+        // Assert
+        expect(result[2]).toBeDefined();
+    });
 });

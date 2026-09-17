@@ -50,10 +50,12 @@ export default class AnalyticsRepository{
 
             take: 3,
 
+            where,
+
         })
 
 		return suppliersId;
-        
+
     }
 
     async getSuppliersById(ids){

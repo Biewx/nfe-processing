@@ -39,6 +39,36 @@ model Company{
   name String @db.VarChar(120)
   invoices Invoice[]
   users User[]
+  monthlyReportRuns MonthlyReportRun[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum MonthlyReportRunStatus {
+  PENDING
+  SENDING
+  SENT
+  FAILED
+}
+
+// Um registro por (companyId, referenceMonth, referenceYear) -- e o que
+// garante idempotencia (AD-5): o job mensal so cria linha PENDING se nao
+// existir uma pro mesmo ciclo, e o drain so envia se a transicao
+// PENDING -> SENDING for aceita atomicamente (evita double-send entre ticks
+// sobrepostos). Nao guarda o conteudo do relatorio -- so agendamento e
+// resultado, o conteudo e recomposto na hora do envio (AD-6).
+model MonthlyReportRun{
+  @@map("monthly_report_runs")
+  @@unique([companyId, referenceMonth, referenceYear])
+  id Int @id @default(autoincrement())
+  companyId Int
+  company Company @relation(fields: [companyId], references: [id])
+  referenceMonth Int
+  referenceYear Int
+  status MonthlyReportRunStatus @default(PENDING)
+  errorMessage String?
+  scheduledAt DateTime
+  sentAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

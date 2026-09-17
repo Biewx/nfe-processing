@@ -222,4 +222,29 @@ describe("GetSavingsOpportunitiesService", () => {
         expect(result).toHaveLength(1);
         expect(result[0].product).toBe("Papel A4");
     });
+
+    it("sem month/year, não passa nenhuma janela pro repository (comportamento atual preservado)", async () => {
+        // Arrange
+        fakeRepository.findLatestPurchasePerProduct.mockResolvedValue([]);
+
+        // Act
+        await service.getSavingsOpportunities(companyId);
+
+        // Assert
+        expect(fakeRepository.findLatestPurchasePerProduct).toHaveBeenCalledWith(companyId, undefined);
+    });
+
+    it("com month/year, passa a janela do mês de referência pro repository (AD-3)", async () => {
+        // Arrange
+        fakeRepository.findLatestPurchasePerProduct.mockResolvedValue([]);
+
+        // Act
+        await service.getSavingsOpportunities(companyId, 8, 2026);
+
+        // Assert
+        expect(fakeRepository.findLatestPurchasePerProduct).toHaveBeenCalledWith(companyId, {
+            start: new Date(2026, 7, 1),
+            end: new Date(2026, 7, 31, 23, 59, 59),
+        });
+    });
 });

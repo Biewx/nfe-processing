@@ -18,6 +18,11 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
         AnalyticsRepository,
         PrismaService,
         JwtAuthGuard
+    ],
+    // monthly-report consome SuppliersService diretamente (AD-1) -- nunca o
+    // redeclara como provider proprio, importa este modulo.
+    exports: [
+        SuppliersService,
     ]
 })
 export class AnalyticsModule {}

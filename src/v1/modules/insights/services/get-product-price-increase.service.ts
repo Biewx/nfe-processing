@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import InsightsRepository from "../repositories/insights.repository";
 import { FiltersDto } from "../../analytics/dtos/filters.dto";
+import { getReferenceMonthWindow } from "../utils/get-reference-month-window";
 
 // fora da classe porque não depende de nenhum parâmetro do método -- não faz
 // sentido recriar esse valor toda vez que getProductPriceIncrease é chamado
@@ -41,6 +42,17 @@ export default class GetProductPriceIncreaseService {
 
         const result: Record<number, any> = {};
 
+        // Quando um mes de referencia foi pedido, so essa janela -- nao "antes
+        // do corte" -- decide quem tem uma compra "atual". Achado no
+        // code-review: sem isso, um fornecedor sem nenhuma compra dentro do
+        // mes de referencia mas com historico antigo (findPurchaseHistoryByProduct
+        // so aplica corte SUPERIOR, AD-4) ainda aparecia com sua ultima compra
+        // de meses atras tratada como "atual" -- um alerta de marco reportado
+        // (e repetido) no relatorio de agosto.
+        const referenceWindow = params.month && params.year
+            ? getReferenceMonthWindow(params.month, params.year)
+            : undefined;
+
         bySupplierArray.forEach((supplier) => {
             const supplierId = supplier[0];
             const purchases = supplier[1];
@@ -48,6 +60,14 @@ export default class GetProductPriceIncreaseService {
             // o repository ordena por issuedAt desc, entao o primeiro item da
             // lista e sempre a compra mais recente; o resto e o historico
             const [current, ...previousPurchases] = purchases;
+
+            if (referenceWindow) {
+                const purchasedAt = current.invoice.issuedAt;
+                const purchasedInWindow = purchasedAt >= referenceWindow.start && purchasedAt <= referenceWindow.end;
+                if (!purchasedInWindow) {
+                    return;
+                }
+            }
 
             // sem compras anteriores, nao existe base pra comparar -- nao da
             // pra calcular uma media nem dizer se houve aumento de verdade.
